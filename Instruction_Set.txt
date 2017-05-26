@@ -1,0 +1,202 @@
+Instructions are of fixed size and are 16 bits long. The high 4 bits of an instruction are always the opcode.
+In general, if not specified otherwise, bits 11-8 are directly mapped to operand 1 register, bits 7-4 are operand 2 register
+and bits 3-0 are operand 3 (destination) register. 
+
+
+MOV (NOP) - Move data between registers/ No operation
+opcode: 0x0
+Operand 1: source register
+operand 2: has no effect
+operand 3: destination
+Flags set: N/A
+Explanation: Takes the data in operand 1 register and saves it in operand 3 register. Moving register 0
+to register 0 is effectively a NOP(no operation) operation and usually has a machine code of 0x0000.
+Example: 
+mov r1 r5
+translates to machine code 0x0105
+writes the contents of r1 into r5, leaving r1 unmodified. 
+
+ADD - integer addition
+opcode: 0x1
+Operand 1: summand1
+Operand 2: summand2
+Operand 3: result destination
+Flags set: Zero, Overflow
+Explanation: Adds the data in operand 1 and operand 2, and saves the result in operand 3. Sets zero flag
+if the result is zero and overflow flag if the calculation resulted in overflow in the adder.
+Example: add r2 r3 r2
+translates to machine code 0x1232
+adds together the contents of r2 and r3, saving the result again, in r2, writing over
+the initial value held in r2 but leaving r3 unmodified.
+
+SUB - integer subtraction
+opcode: 0x2
+Operand 1: minuend
+Operand 2: subtrahend
+Operand 3: result destination
+Flags set: Zero, Overflow
+Explanation: Subtracts operand 2 from operand 1 and saves the result in operand 3. Sets zero flag if the
+result is zero and overflow flag if the calculation resulted in overflow in the adder. It is important
+to keep in mind the intricate details of how the adder is used for subtraction and to use the overflow flag
+accordingly, with care.
+Example: sub r3 r2 r1
+translates to machine code 0x2321
+subtracts the contents of r2 from r3 and saves the result in r1, leaving r2 and r3 unmodified.
+
+AND - bitwise logical AND
+opcode: 0x3
+OR - bitwise logical OR
+opcode: 0x4
+XOR - bitwise logical XOR
+opcode: 0x5
+Operand 1: first operand
+Operand 2: second operand
+Operand 3: destination of result
+Flags set: zero
+Explanation: does the respective bitwise boolean logic operations on operand 1 and operand 2, saving
+the result in operand 3 and setting the zero flag if the result is zero.
+Example:
+and r5 r7 r1
+machinecode: 0x3571
+or r2 r9 r2
+machinecode: 0x4292
+xor r1 r1 r1
+machinecode: 0x5111
+
+NOT - bitwise logical NOT
+opcode: 0x6
+Operand 1: no effect
+Operand 2: number to NOT
+Operand 3: destination
+Flags set: zero
+Explanation: bitwise inverts the number in operand 2 and saves the result in operand 3. It is important
+to note that this is not a 2's complementary inversion instruction!
+Example:
+not r1 r2
+machinecode: 0x6012
+
+INC - increment
+opcode: 0x7
+DEC - decrement
+opcode: 0xf
+Operand 1: number to increment/decrement
+Operand 2: no effect
+Operand 3: destination to save the result
+Flags set: Zero, Overflow
+Explanation: increments or decrements the number in operand 1 and saves the result in operand 3
+Example: 
+inc r1 r1
+machinecode: 0x7101
+increments r1 and saves the result in r1 as well.
+dec r2 r3
+machinecode: 0xf203
+decrements the value in r2 and saves it in r3, leaving r2 unmodified.
+
+TST - test
+opcode: 0x8
+Operand 1: first value to test
+Operand 2: second value to test
+Operand 3: no effect
+Flags set: A>B
+Explanation: tests to see if operand 1 is greater than operand 2, if so, sets the A>B flag. Both registers
+will remain unmodified and no result other than the possible flag switch will be saved.
+Example: 
+tst r1 r2
+machinecode: 0x8120
+
+IO - poll for input and/or push an output
+opcode: 0x9
+Operand 1: i/o ports affected(see below)
+Operand 2: data to output
+Operand 3: input destination
+Flags set: Interrupt
+			i/o ports affected:
+			lower 2 bits of the half-byte denote the output port
+			higher 2 bits of the half-byte denote the input port to poll
+			having 0 as the port means no port is selected. If both ports are left at 0, then this
+			instruction effectively becomes a NOP instruction
+Explanation: receives input from an external device and/or sends output to an external device. If polling
+for input, and the device connected to the chosen port indeed has data to give to the processor, then
+the "Interrupt" flag is set, otherwise it is left unmodified. 
+Example:
+io 1 0 r0 r3
+machinecode: 0x9403
+checks for input from input port 1, if data is present, saves it in r3 and sets Interrupt flag
+io 3 1 r2 r5
+machinecode: 0x9d25
+sends data saved in r2 to output port 1 and at the same time checks for input from port 3, saves it
+in r5 and sets Interrupt flag if it is indeed present. 
+
+SAVE - save register into memory
+opcode: 0xa
+Operand 1: memory address
+Operand 2: data
+Operand 3: no effect
+Flags set: N/A
+Explanation: saves data saved in operand 2 at memory location pointed to by operand 1
+Example:
+save rf r1
+machinecode: 0xaf10
+
+LOAD - load memory into register
+opcode: 0xb
+Operand 1: memory address
+Operand 2: no effect
+Operand 3: destination
+Flags set: N/A
+Explanation: saves data saved at memory location pointed to by operand 1 in operand 3
+Example:
+load rf r2
+machinecode: 0xbf02
+
+j% - (un)conditional jump
+opcode: 0xc
+bits 11-9 = condition
+bits 8-0 = direct address to jump to if condition is filled
+Flags set: N/A
+			conditions:
+			0x0: always/unconditional (jmp)
+			0x1: if zero flag is set (jmz)
+			0x2: if overflow flag is set (jmo)
+			0x3: if A>B flag is set (jmg)
+			0x4: -
+			0x5: -
+			0x6: -
+			0x7: if interrupt flag is set (jmi)
+Explanation: checks a flag for if a condition is met, if so, initiates a direct jump and continues
+program execution at the new address. Jumping to the same address as itself has the very real potential
+of halting the processor and jumping to the address right after the jump instruction effectively makes
+it a NOP instruction.
+Example:
+jmp 5f
+machinecode: 0xc05f
+unconditionally jumps to address 5f in the program memory and continues execution from there.
+jmz 10a
+machinecode: 0xc30a
+if the zero flag is set, jumps to address 10a in the program memory and continues execution from there.
+
+LDI - load immidate
+opcode: 0xd
+bits 11-4 = immediate value
+bits 3-0 = destination register
+Flags set: N/A
+Explanation: loads the immediate value embedded in the instruction to the register pointed to by 
+bits 3-0 of the instruction.
+Example:
+ldi 0a r3
+machinecode: 0xd0a3
+saves 0x0a into r3
+
+LSF - left-shift
+opcode: 0xe
+operand 1: number to be shifted
+operand 2: how much to shift for (max 0x7 - higher bits of the number are ignored)
+operand 3: destination
+flags set: zero
+Explanation: Left shifts number in operand 1 by operand 2 places to the left, left-most bits will be
+discarded. result is saved in operand 3. zero flag is set if the result is zero.
+Example:
+lsf r1 r3 r1
+machinecode: 0xe131
+left shifts r1 by however many places is denoted by r3's lower 3 bits and saves result in r1, leaving r3
+unmodified.

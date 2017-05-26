@@ -108,7 +108,7 @@ void jmp(FILE* fo, char input[], int counter)
 		default:	printf("Unable to resolve code written at line %d\n", counter);
 					return;
 	}
-	if(input[5] != ' ' && input[6] != ' ' && input[5] != '\n' && input[6] != '\n')
+	if(input[5] != ' ' && input[6] != ' ' && input[5] != '\n' && input[6] != '\n')		//please don't look at this monster...
 	{
 		flags = flags | 1;
 		fprintf(fo, "c%x%c%c ", flags, input[5], input[6]);
