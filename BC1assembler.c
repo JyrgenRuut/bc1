@@ -235,6 +235,9 @@ int main()
 		++trueCounter;
 	}
 	
+	fclose(fi);
+	fclose(fo);
+	
 	printf("\n\n\nAll Done! Click any key to exit.");
 	scanf("%c", input);
 	return 0;
