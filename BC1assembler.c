@@ -176,6 +176,7 @@ int main()
 	int trueCounter = 1;
 	FILE* fi = fopen("input.txt", "r");
 	FILE* fo = fopen("output.txt", "w");
+	
 	if(fi == NULL || fo == NULL) 
 	{
 		printf("Failed to open one or more files, make sure you have input.txt in the parent folder! Press any key to exit. ");
@@ -189,47 +190,60 @@ int main()
 		{
 			case '/':	--trueCounter;
 						break;
+						
 			case 'j':	jmp(fo, input, counter);
 						break;
+						
 			case 'i':	if(input[1] == 'n' && input[2] == 'c') inc(fo, input, counter);
 						else if(input[1] == 'o') io(fo, input, counter);
 						else goto FAILURE;
 						break;
+						
 			case 'd':	if(input[1] == 'e' && input[2] == 'c') dec(fo, input, counter);
 						else goto FAILURE;
 						break;
+						
 			case 'a':	if(input[1] == 'd' && input[2] == 'd') add(fo, input, counter);
 						else if(input[1] == 'n' && input[2] == 'd') and(fo, input, counter);
 						else goto FAILURE;
 						break;
+						
 			case 's':	if(input[1] == 'u' && input[2] == 'b') sub(fo, input, counter);
 						else if(input[1] == 'a' && input[2] == 'v' && input[3] == 'e') save(fo, input, counter);
 						else goto FAILURE;
 						break;
+						
 			case 'x':	if(input[1] == 'o' && input[2] == 'r') xor(fo, input, counter);
 						else goto FAILURE;
 						break;
+						
 			case 'l':	if(input[1] == 'd' && input[2] == 'i') ldi(fo, input, counter);
 						else if(input[1] == 's' && input[2] == 'f') lsf(fo, input, counter);
 						else if(input[1] == 'o' && input[2] == 'a' && input[3] == 'd') load(fo, input, counter);
 						else goto FAILURE;
 						break;
+						
 			case 'o':	if(input[1] == 'r') or(fo, input, counter);
 						else goto FAILURE;
 						break;
+						
 			case 'm':	if(input[1] == 'o' && input[2] == 'v') mov(fo, input, counter);
 						else goto FAILURE;
 						break;
+						
 			case 'n':	if(input[1] == 'o' && input[2] == 'p') fprintf(fo, "0000 ");
 						else if(input[1] == 'o' && input[2] == 't') not(fo, input, counter);
 						else goto FAILURE;
 						break;
+						
 			case 't':	if(input[1] == 's' && input[2] == 't') tst(fo, input, counter);
 						else goto FAILURE;
 						break;
+						
 			default:	FAILURE:	
 						printf("Unable to resolve code written at line %d\n", counter);
 		}
+		
 		if(trueCounter % 8 == 0) fputc('\n', fo);
 		++counter;
 		++trueCounter;

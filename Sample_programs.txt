@@ -1,0 +1,69 @@
+A program which fills and then unfills the matrix screen in the simulation
+
+/First instruction should always be a nop, because if one starts the processor, it is already pointing to instruction at
+/address 0x000, meaning it will not be executed properly, thus the first meaningful instruction should
+/start from address 0x001
+nop
+xor r1 r1 r1
+io 0 3 r1 r0
+inc r1 r1
+jmp 02
+
+assembles to:
+
+0000 5111 9310 7101 c002 
+
+###########################################
+
+A program which takes input from the keyboard and directs it to the terminal screen
+
+nop
+io 1 0 r0 r1
+jmi 04
+jmp 01
+io 0 2 r1 r0
+io 0 1 r0 r0
+jmp 01
+
+assembles to:
+
+0000 9401 ce04 c001 9210 9100 c001 
+
+###########################################
+
+A program which takes input from the keyboard and makes lower-case ascii letters upper-case and vice versa.
+non-letter characters stay the same.
+
+nop
+ldi 40 r2
+ldi 5a r3
+ldi 60 r4
+ldi 7a r5
+ldi 20 r6
+io 1 0 r0 r1
+jmi 09
+jmp 06
+tst r1 r2
+jmg 0c
+jmp 17
+tst r1 r3
+jmg 0f
+jmp 16
+tst r1 r4
+jmg 12
+jmp 17
+tst r1 r5
+jmg 17
+sub r1 r6 r1
+jmp 17
+add r1 r6 r1
+io 0 2 r1 r0
+io 0 1 r0 r0
+jmp 06
+
+assembles to:
+
+0000 d402 d5a3 d604 d7a5 d206 9401 ce09 
+c006 8120 c60c c017 8130 c60f c016 8140 
+c612 c017 8150 c617 2161 c017 1161 9210 
+9100 c006 
