@@ -117,7 +117,7 @@ Flags set: Interrupt
 			instruction effectively becomes a NOP instruction
 Explanation: receives input from an external device and/or sends output to an external device. If polling
 for input, and the device connected to the chosen port indeed has data to give to the processor, then
-the "Interrupt" flag is set, otherwise it is left unmodified. 
+the "Interrupt" flag is set, otherwise it is cleared/left unmodified.
 Example:
 io 1 0 r0 r3
 machinecode: 0x9403
@@ -125,7 +125,7 @@ checks for input from input port 1, if data is present, saves it in r3 and sets 
 io 3 1 r2 r5
 machinecode: 0x9d25
 sends data saved in r2 to output port 1 and at the same time checks for input from port 3, saves it
-in r5 and sets Interrupt flag if it is indeed present. 
+in r5 and sets Interrupt flag if it is indeed present, clears/is left unmodified otherwise. 
 
 SAVE - save register into memory
 opcode: 0xa
