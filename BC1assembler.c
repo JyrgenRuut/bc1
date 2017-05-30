@@ -1,58 +1,24 @@
 #include <stdio.h>
 #include <string.h>
 
-void mov(FILE* fo, char input[], int counter)
+void _2OperandFunc(FILE* fo, char input[], int counter, char hexCode)
 {
-	if(strlen(input) >= 8) fprintf(fo, "0%c0%c ", input[5], input[8]);
+	if(strlen(input) >= 8) fprintf(fo, "%c%c0%c ", hexCode, input[5], input[8]);
 	else printf("Unable to resolve code written at line %d\n", counter);
 	return;
 }
 
-void add(FILE* fo, char input[], int counter)
+void _3OperandFunc(FILE* fo, char input[], int counter, int opcodeLetters, char hexCode)
 {
-	if(strlen(input) >= 11) fprintf(fo, "1%c%c%c ", input[5], input[8], input[11]);
+	if(strlen(input) >= (8 + opcodeLetters)) fprintf(fo, "%c%c%c%c ", hexCode, input[4], input[7], input[10]);
 	else printf("Unable to resolve code written at line %d\n", counter);
 	return;
 }
 
-void sub(FILE* fo, char input[], int counter)
-{
-	if(strlen(input) >= 11) fprintf(fo, "2%c%c%c ", input[5], input[8], input[11]);
-	else printf("Unable to resolve code written at line %d\n", counter);
-	return;
-}
-
-void and(FILE* fo, char input[], int counter)
-{
-	if(strlen(input) >= 11) fprintf(fo, "3%c%c%c ", input[5], input[8], input[11]);
-	else printf("Unable to resolve code written at line %d\n", counter);
-	return;
-}
-
-void or(FILE* fo, char input[], int counter)
-{
-	if(strlen(input) >= 10) fprintf(fo, "4%c%c%c ", input[4], input[7], input[10]);
-	else printf("Unable to resolve code written at line %d\n", counter);
-	return;
-}
-
-void xor(FILE* fo, char input[], int counter)
-{
-	if(strlen(input) >= 11) fprintf(fo, "5%c%c%c ", input[5], input[8], input[11]);
-	else printf("Unable to resolve code written at line %d\n", counter);
-	return;
-}
-
+//improtant
 void not(FILE* fo, char input[], int counter)
 {
 	if(strlen(input) >= 8) fprintf(fo, "60%c%c ", input[5], input[8]);
-	else printf("Unable to resolve code written at line %d\n", counter);
-	return;
-}
-
-void inc(FILE* fo, char input[], int counter)
-{
-	if(strlen(input) >= 8) fprintf(fo, "7%c0%c ", input[5], input[8]);
 	else printf("Unable to resolve code written at line %d\n", counter);
 	return;
 }
@@ -162,13 +128,6 @@ void lsf(FILE* fo, char input[], int counter)
 	return;
 }
 
-void dec(FILE* fo, char input[], int counter)
-{
-	if(strlen(input) >= 8) fprintf(fo, "f%c0%c ", input[5], input[8]);
-	else printf("Unable to resolve code written at line %d\n", counter);
-	return;
-}
-
 int main()
 {
 	char input[200];
@@ -194,26 +153,26 @@ int main()
 			case 'j':	jmp(fo, input, counter);
 						break;
 						
-			case 'i':	if(input[1] == 'n' && input[2] == 'c') inc(fo, input, counter);
+			case 'i':	if(input[1] == 'n' && input[2] == 'c') _2OperandFunc(fo, input, counter, '7');
 						else if(input[1] == 'o') io(fo, input, counter);
 						else goto FAILURE;
 						break;
 						
-			case 'd':	if(input[1] == 'e' && input[2] == 'c') dec(fo, input, counter);
+			case 'd':	if(input[1] == 'e' && input[2] == 'c') _2OperandFunc(fo, input, counter, 'f');
 						else goto FAILURE;
 						break;
 						
-			case 'a':	if(input[1] == 'd' && input[2] == 'd') add(fo, input, counter);
-						else if(input[1] == 'n' && input[2] == 'd') and(fo, input, counter);
+			case 'a':	if(input[1] == 'd' && input[2] == 'd') _3OperandFunc(fo, input, counter, 3, '1');
+						else if(input[1] == 'n' && input[2] == 'd') _3OperandFunc(fo, input, counter, 3, '3');
 						else goto FAILURE;
 						break;
 						
-			case 's':	if(input[1] == 'u' && input[2] == 'b') sub(fo, input, counter);
+			case 's':	if(input[1] == 'u' && input[2] == 'b') _3OperandFunc(fo, input, counter, 3, '2');
 						else if(input[1] == 'a' && input[2] == 'v' && input[3] == 'e') save(fo, input, counter);
 						else goto FAILURE;
 						break;
 						
-			case 'x':	if(input[1] == 'o' && input[2] == 'r') xor(fo, input, counter);
+			case 'x':	if(input[1] == 'o' && input[2] == 'r') _3OperandFunc(fo, input, counter, 3, '5');
 						else goto FAILURE;
 						break;
 						
@@ -223,11 +182,11 @@ int main()
 						else goto FAILURE;
 						break;
 						
-			case 'o':	if(input[1] == 'r') or(fo, input, counter);
+			case 'o':	if(input[1] == 'r') _3OperandFunc(fo, input, counter, 2, '6');
 						else goto FAILURE;
 						break;
 						
-			case 'm':	if(input[1] == 'o' && input[2] == 'v') mov(fo, input, counter);
+			case 'm':	if(input[1] == 'o' && input[2] == 'v') _2OperandFunc(fo, input, counter, '0');
 						else goto FAILURE;
 						break;
 						
